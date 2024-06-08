@@ -28,11 +28,12 @@ class AddTaskBloc extends Bloc<AddTaskEvent, AddTaskState> {
 
           if (connectivityResult.name == "none") {
             LocalDB().saveTaskData(event.task).then((value) {
-              print("save data locally >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-              emit(AddTaskSuccessfully(event.taskID!));
+              print(
+                  "save data locally >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${event.task.toJson()}");
+              emit(AddTaskSuccessfully(event.task.id!));
             });
           } else {
-            String taskID = await backEnd.addTask(event.task);
+            await backEnd.addTask(event.task);
             print(
                 "add task successfully.......................${event.task.id}..");
             // event.task.id = taskID;
@@ -40,7 +41,7 @@ class AddTaskBloc extends Bloc<AddTaskEvent, AddTaskState> {
             // update task to firebase to add id
             // await backEnd.updateTask(event.task).then((value) {
             // emit(LoadingState());
-            emit(AddTaskSuccessfully(taskID));
+            emit(AddTaskSuccessfully(event.task.id!));
             // });
           }
           // });

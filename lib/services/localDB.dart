@@ -9,6 +9,7 @@ class LocalDB {
     await prefs.setString('title', task.title!);
     await prefs.setString('date', task.date.toString());
     await prefs.setBool('isDone', task.isDone!);
+    await prefs.setString('id', task.id!);
   }
 
   Future getTaskData() async {
@@ -17,13 +18,13 @@ class LocalDB {
     final String? title = await prefs.getString('title');
     if (title != null) {
       task.title = await prefs.getString('title');
-      final String? date = await prefs.getString('date');
+      task.date = await prefs.getString('date');
       // String dateWithT = date!.substring(0, 8) + 'T' + date.substring(8);
       // DateTime tempDate = DateFormat("yyyy-MM-dd hh:mm:ss").parse(date!);
 
       // // DateTime dateTime = DateTime.parse(tempDate);
       // Timestamp timestamp = Timestamp.fromDate(tempDate);
-      task.date = date;
+      task.id = await prefs.getString("id");
       task.isDone = await prefs.getBool('isDone');
     }
     return task;

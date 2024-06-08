@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_management_app/bloc/add_task_bloc.dart';
@@ -40,14 +42,22 @@ class _MobileScreenState extends State<MobileScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         actions: [
-          IconButton(
-              onPressed: () {
-                BlocProvider.of<GetAllTasksBloc>(context).add(GetAllTasks());
-              },
-              icon: Icon(
-                Icons.refresh,
-                color: Colors.green,
-              ))
+          (currentIndex == 0)
+              ? BlocBuilder<GetAllTasksBloc, GetAllTasksState>(
+                  builder: (context, state) {
+                    return IconButton(
+                        onPressed: () async {
+                          await checkConnectivity();
+                          BlocProvider.of<GetAllTasksBloc>(context)
+                              .add(GetAllTasks());
+                        },
+                        icon: Icon(
+                          Icons.refresh,
+                          color: Colors.green,
+                        ));
+                  },
+                )
+              : Container()
         ],
         title: Text(
           "Good Morning",
@@ -331,6 +341,7 @@ class _MobileScreenState extends State<MobileScreen> {
                   task.title = title.text;
                   task.isDone = false;
                 });
+                print("task id : ${task.id.toString()}");
                 BlocProvider.of<AddTaskBloc>(context).add(AddTask(task));
                 setState(() {
                   dateTime = null;
@@ -436,4 +447,27 @@ class _MobileScreenState extends State<MobileScreen> {
   //     },
   //   );
   // }
+
+  Future<ConnectivityResult> checkConnectivity() async {
+    // late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+    late ConnectivityResult result = ConnectivityResult.none;
+    result = await Connectivity().checkConnectivity();
+    if (result.name != "none") {
+      localDB.getTaskData().then((value) {
+        print(
+            "data is from local <<<<<<<<<<<<<<<<<<<<<< : ${value.title.toString()}");
+        if (value.title.toString().isNotEmpty) {
+          //add data to firestore
+          BlocProvider.of<AddTaskBloc>(context).add(AddTask(value));
+
+          localDB.clearData();
+
+          // BlocProvider.of<AddTaskBloc>(context).add(AddTask(value));
+        }
+      });
+    }
+
+    return result;
+  }
 }

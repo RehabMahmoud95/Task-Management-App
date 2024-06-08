@@ -72,10 +72,17 @@ class _TasksScreenState extends State<TasksScreen> {
               if (widget.currentIndex == 1 &&
                   !task.isDone! &&
                   !notDoneTasks.contains(task)) {
+                notDoneTasks.add(task);
+                // notDoneTasks.forEach((element) {
+                //   print("element id: ${element.id}");
+                //   if (element.id != task.id) {
+
+                //   }
+                // });
+                //
                 // for (int i = 0; i < doneTasks.length;i++) {
                 //   print("Done tasks : ${doneTasks.toString()}");
                 //   if (!doneTasks.contains(task)) {
-                notDoneTasks.add(task);
                 //   }
                 // }
 
